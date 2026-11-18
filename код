@@ -1,0 +1,13 @@
+CREATE TABLE packaging (
+    id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code       VARCHAR(64) NOT NULL,
+    type       ENUM('PALLET','BOX','TEA') NOT NULL,
+    parent_id  BIGINT UNSIGNED NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uq_code (code),
+    KEY idx_parent (parent_id),
+    CONSTRAINT fk_parent
+        FOREIGN KEY (parent_id) REFERENCES packaging(id)
+        ON DELETE RESTRICT
+) ENGINE=InnoDB;
