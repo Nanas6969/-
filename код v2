@@ -1,0 +1,18 @@
+SET @json = LOAD_FILE('/путь/к/scans.json');
+
+INSERT INTO tea_scan (tea_dm, box_dm, pallet_dm, scanned_at)
+SELECT
+    jt.tea_dm,
+    jt.box_dm,
+    jt.pallet_dm,
+    COALESCE(jt.scanned_at, NOW())
+FROM JSON_TABLE(@json, '$[*]' COLUMNS (
+    tea_dm     VARCHAR(128) PATH '$.tea_dm',
+    box_dm     VARCHAR(128) PATH '$.box_dm',
+    pallet_dm  VARCHAR(128) PATH '$.pallet_dm',
+    scanned_at DATETIME     PATH '$.scanned_at'
+)) AS jt
+ON DUPLICATE KEY UPDATE
+    box_dm     = VALUES(box_dm),
+    pallet_dm  = VALUES(pallet_dm),
+    scanned_at = VALUES(scanned_at);
